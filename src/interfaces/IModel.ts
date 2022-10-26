@@ -1,7 +1,7 @@
 export interface IModel<T> {
   create(obj: T):Promise<T>,
-  read(string: string):Promise<T[]>,
-  readOne(string: string):Promise<T | null>,
-  update(string: string, obj: T):Promise<T | null>,
-  delete(string: string):Promise<T | null>,
+  read(paramsRead: string):Promise<T[]>,
+  readOne(_id: string):Promise<T | null>,
+  // update(paramsUpdate: string, obj: T):Promise<T | null>,
+  // delete(paramsDelete: string):Promise<T | null>,
 }
