@@ -20,12 +20,12 @@ abstract class MongoModel<T> implements IModel<T> {
     return this._model.findOne({ _id });
   }
 
-  // public update(paramsUpdate: string, obj: T): Promise<T | null> {
-  //   return this._model.findOneAndUpdate(paramsUpdate, obj);
-  // }
+  public async update(_id: string, obj: Partial<T>): Promise<T | null> {
+    return this._model.findOneAndUpdate({ _id }, { ...obj }, { new: true });
+  }
 
-  // public delete(paramsDelete: string): Promise<T | null> {
-  //   return this._model.findOneAndDelete({ paramsDelete });
+  // public delete(_id: string): Promise<T | null> {
+  //   return this._model.findOneAndDelete({ _id: string });
   // }
 }
 
