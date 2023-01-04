@@ -7,9 +7,9 @@ const carsMongooseSchema = new Schema<ICar>({
   year: Number,
   color: String,
   status: Boolean,
-  buyValue: String,
-  doorsQty: String,
-  seatsQty: String,
+  buyValue: Number,
+  doorsQty: Number,
+  seatsQty: Number,
 }, { versionKey: false });
 
 class CarModel extends MongoModel<ICar> {
