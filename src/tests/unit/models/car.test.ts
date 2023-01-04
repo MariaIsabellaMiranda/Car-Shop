@@ -8,7 +8,8 @@ import {
   carsMockWithIdStatusNot,
   carsMockStatusTrue,
   carsMockStatusFalse,
-  errorCarsMock
+  errorCarsMock,
+  carsMockWithIdStatusNotArray
 } from '../mocks/carsMocks';
 
 describe('CarModel', () => {
@@ -17,6 +18,12 @@ describe('CarModel', () => {
   before(async () => {
     sinon
       .stub(Model, 'create')
+      .resolves(carsMockWithIdStatusNot);
+      sinon
+      .stub(Model, 'find')
+      .resolves(carsMockWithIdStatusNotArray);
+      sinon
+      .stub(Model, 'findOne')
       .resolves(carsMockWithIdStatusNot);
   });
 
@@ -28,5 +35,28 @@ describe('CarModel', () => {
     const newCar = await carModel.create(carsMockStatusNot);
 
     expect(newCar).to.be.deep.equal(carsMockWithIdStatusNot);
+  });
+
+  it('Lista todos os carros registrados', async () => {
+    const newCar = await carModel.read();
+
+    expect(newCar).to.be.deep.equal(carsMockWithIdStatusNotArray);
+  });
+
+  it('Lista um único carro através do seu id', async () => {
+    const newCar = await carModel.readOne(carsMockWithIdStatusNot._id);
+
+    expect(newCar).to.be.deep.equal(carsMockWithIdStatusNot);
+  });
+
+  it('Erro ao passar um id com tamanho menor que 24', async () => {
+    let error;
+    try {
+      const newCar = await carModel.readOne('abc');
+    } catch (err) {
+      error = err;
+    }
+
+    expect(error.message).to.be.eq('Id must have 24 hexadecimal characters');
   });
 });
