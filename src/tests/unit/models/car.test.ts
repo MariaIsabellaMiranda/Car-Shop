@@ -1,62 +1,89 @@
 import { Model } from 'mongoose';
 import * as sinon from 'sinon';
-import chai from 'chai';
 import { expect } from 'chai';
 import CarModel from '../../../models/CarModel';
 import {
   carsMockStatusNot,
   carsMockWithIdStatusNot,
-  carsMockStatusTrue,
-  carsMockStatusFalse,
-  errorCarsMock,
-  carsMockWithIdStatusNotArray
+  invalidIdCarsMock,
 } from '../mocks/carsMocks';
 
 describe('CarModel', () => {
   const carModel = new CarModel();
 
   before(async () => {
-    sinon
-      .stub(Model, 'create')
-      .resolves(carsMockWithIdStatusNot);
-      sinon
-      .stub(Model, 'find')
-      .resolves(carsMockWithIdStatusNotArray);
-      sinon
-      .stub(Model, 'findOne')
-      .resolves(carsMockWithIdStatusNot);
+    sinon.stub(Model, 'create').resolves(carsMockWithIdStatusNot);
+    sinon.stub(Model, 'find').resolves([carsMockWithIdStatusNot]);
+    sinon.stub(Model, 'findOne')
+    .onCall(0).resolves(carsMockWithIdStatusNot)
+    .onCall(1).resolves(null);
+    sinon.stub(Model, 'findOneAndUpdate')
+    .onCall(0).resolves(carsMockWithIdStatusNot)
+    .onCall(1).resolves(null);
+    sinon.stub(Model, 'findOneAndDelete')
+    .onCall(0).resolves(carsMockWithIdStatusNot)
+    .onCall(1).resolves(null);
   });
 
   after(()=>{
     sinon.restore();
   })
 
-  it('Cria coleção Cars com sucesso', async () => {
-    const newCar = await carModel.create(carsMockStatusNot);
+  describe('Método create', () => {
+    it('Cria coleção Cars com sucesso', async () => {
+      const newCar = await carModel.create(carsMockStatusNot);
+  
+      expect(newCar).to.be.deep.equal(carsMockWithIdStatusNot);
+    });
+  })
 
-    expect(newCar).to.be.deep.equal(carsMockWithIdStatusNot);
-  });
+  describe('Método read', () => {
+    it('Lista todos os carros registrados', async () => {
+      const newCar = await carModel.read();
+  
+      expect(newCar).to.be.deep.equal([carsMockWithIdStatusNot]);
+    });
+  })
 
-  it('Lista todos os carros registrados', async () => {
-    const newCar = await carModel.read();
+  describe('Método readOne', () => {
+    it('Lista um único carro através do seu id', async () => {
+      const newCar = await carModel.readOne(carsMockWithIdStatusNot._id);
+  
+      expect(newCar).to.be.deep.equal(carsMockWithIdStatusNot);
+    });
 
-    expect(newCar).to.be.deep.equal(carsMockWithIdStatusNotArray);
-  });
+    it('Retorna null caso o id seja inválido', async () => {
+      const newCar = await carModel.readOne(invalidIdCarsMock._id);
+  
+      expect(newCar).to.be.equal(null);
+    });
+  })
 
-  it('Lista um único carro através do seu id', async () => {
-    const newCar = await carModel.readOne(carsMockWithIdStatusNot._id);
+  describe('Método update', () => {
+    it('Atualiza um carro através do seu id', async () => {
+      const newCar = await carModel.update(carsMockWithIdStatusNot._id, carsMockStatusNot);
+  
+      expect(newCar).to.be.deep.equal(carsMockWithIdStatusNot);
+    });
 
-    expect(newCar).to.be.deep.equal(carsMockWithIdStatusNot);
-  });
+    it('Retorna null caso o id seja inválido', async () => {
+      const newCar = await carModel.update(invalidIdCarsMock._id, carsMockStatusNot);
+  
+      expect(newCar).to.be.equal(null);
+    });
+  })
 
-  it('Erro ao passar um id com tamanho menor que 24', async () => {
-    let error;
-    try {
-      const newCar = await carModel.readOne('abc');
-    } catch (err) {
-      error = err;
-    }
+  describe('Método delete', () => {
+    it('Exclui um carro do db através do seu id', async () => {
+      const newCar = await carModel.delete(carsMockWithIdStatusNot._id);
+  
+      expect(newCar).to.be.deep.equal(carsMockWithIdStatusNot);
+    });
 
-    expect(error.message).to.be.eq('Id must have 24 hexadecimal characters');
-  });
+    it('Retorna null caso o id seja inválido', async () => {
+      const newCar = await carModel.delete(invalidIdCarsMock._id);
+  
+      expect(newCar).to.be.equal(null);
+    });
+  })
 });
