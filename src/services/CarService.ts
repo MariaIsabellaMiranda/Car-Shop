@@ -47,7 +47,7 @@ class CarService implements IService<ICar> {
     if (_id.length < 24) throw new Error(ErrorTypes.InvalidMongoId);
     
     const carDeleted = await this._cars.delete(_id);
-
+    
     if (!carDeleted) throw Error(ErrorTypes.EntityNotFound);
   }
 }
